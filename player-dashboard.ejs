@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Player Dashboard</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
+  <style>
+    .joined-btn {
+      background-color: #4CAF50;
+      color: white;
+    }
+    .header-bg {
+      background: linear-gradient(90deg, #4a5568, #2d3748);
+      padding: 2rem 0;
+    }
+  </style>
+</head>
+<body class="bg-gray-100">
+  <header class="header-bg text-white">
+    <div class="container mx-auto px-4 flex items-center">
+      <h1 class="text-4xl font-bold">Player Dashboard</h1>
+      <div class="ml-auto flex space-x-6">
+        <a href="#home" class="text-xl hover:text-gray-300">Home</a>
+        <a href="#sportsSection" class="text-xl hover:text-gray-300">Sports</a>
+        <a href="#sessionsCreatedSection" class="text-xl hover:text-gray-300">Sessions</a>
+        <a href="/logout" class="text-xl hover:text-gray-300">Logout</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="container mx-auto px-4 mt-8">
+    <!-- Sports Section -->
+    <section id="sportsSection">
+      <h2 class="text-2xl font-semibold mb-4">Sports</h2>
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+        <% sports.forEach(sport => { %>
+          <div class="bg-white shadow-lg rounded-lg p-6">
+            <h3 class="text-xl font-semibold mb-4"><%= sport.name %></h3>
+            <button 
+              class="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg"
+              onclick="toggleSessionForm('<%= sport.id %>')">
+              Create Session
+            </button>
+          </div>
+        <% }) %>
+      </div>
+    </section>
+
+    <!-- Create Sessions Section -->
+    <section id="createSessionsSection" class="mt-8">
+      <% sports.forEach(sport => { %>
+        <div id="createSessionFormContainer<%= sport.id %>" class="hidden">
+          <h3 class="text-xl font-semibold mb-4">Create Session for <%= sport.name %></h3>
+          <form action="/create-session" method="POST">
+            <input type="hidden" name="sport_id" value="<%= sport.id %>" />
+
+            <div class="mb-4">
+              <label for="team1">Team 1 Players:</label>
+              <div id="team1PlayersContainer<%= sport.id %>" class="space-y-2">
+                <input type="text" name="team1_players[]" class="w-full p-2 border rounded" placeholder="Player Name" required />
+              </div>
+              <button type="button" onclick="addPlayerInput('team1PlayersContainer<%= sport.id %>')" class="bg-gray-300 py-1 px-2 rounded mt-2">Add Player</button>
+            </div>
+
+            <div class="mb-4">
+              <label for="date">Date:</label>
+              <input type="date" name="date" class="w-full p-2 border rounded" required />
+            </div>
+
+            <button type="submit" class="bg-blue-500 text-white py-2 px-4 rounded">Submit</button>
+          </form>
+        </div>
+      <% }) %>
+    </section>
+  </main>
+
+  <script>
+    function toggleSessionForm(sportId) {
+      // Hide all forms
+      document.querySelectorAll('[id^="createSessionFormContainer"]').forEach(form => {
+        form.classList.add('hidden');
+      });
+      // Show the selected form
+      const targetForm = document.getElementById(`createSessionFormContainer${sportId}`);
+      if (targetForm) {
+        targetForm.classList.toggle('hidden');
+      }
+    }
+
+    function addPlayerInput(containerId) {
+      const container = document.getElementById(containerId);
+      if (container) {
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.name = 'team1_players[]';
+        input.className = 'w-full p-2 border rounded';
+        input.placeholder = 'Player Name';
+        container.appendChild(input);
+      }
+    }
+  </script>
+</body>
+</html>
